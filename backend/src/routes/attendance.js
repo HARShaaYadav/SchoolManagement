@@ -1,0 +1,41 @@
+import { Router } from "express";
+import { z } from "zod";
+
+import { requireAuth, requireRole } from "../middleware/auth.js";
+import { validate } from "../utils/validate.js";
+import { getAttendanceByDate, getStudentAttendance, markAttendance } from "../controllers/attendance.js";
+
+export const attendanceRouter = Router();
+
+attendanceRouter.post(
+  "/mark",
+  requireAuth,
+  requireRole(["teacher", "admin"]),
+  validate(
+    z.object({
+      body: z.object({
+        student_id: z.number().int().positive(),
+        date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+        status: z.enum(["present", "absent"]),
+      }),
+    }),
+  ),
+  markAttendance,
+);
+
+attendanceRouter.get(
+  "/:date",
+  requireAuth,
+  requireRole(["teacher", "admin"]),
+  validate(z.object({ params: z.object({ date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/) }) })),
+  getAttendanceByDate,
+);
+
+attendanceRouter.get(
+  "/student/:id",
+  requireAuth,
+  requireRole(["admin", "teacher", "student"]),
+  validate(z.object({ params: z.object({ id: z.coerce.number().int().positive() }) })),
+  getStudentAttendance,
+);
+

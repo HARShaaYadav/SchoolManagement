@@ -1,0 +1,35 @@
+import { Router } from "express";
+import { z } from "zod";
+
+import { requireAuth, requireRole } from "../middleware/auth.js";
+import { validate } from "../utils/validate.js";
+import { addFee, listFees, payFee } from "../controllers/fees.js";
+
+export const feesRouter = Router();
+
+feesRouter.get("/", requireAuth, requireRole(["admin", "teacher", "student"]), listFees);
+
+feesRouter.post(
+  "/",
+  requireAuth,
+  requireRole("admin"),
+  validate(
+    z.object({
+      body: z.object({
+        student_id: z.number().int().positive(),
+        amount: z.number().positive(),
+        due_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+      }),
+    }),
+  ),
+  addFee,
+);
+
+feesRouter.put(
+  "/pay/:id",
+  requireAuth,
+  requireRole("admin"),
+  validate(z.object({ params: z.object({ id: z.coerce.number().int().positive() }) })),
+  payFee,
+);
+
