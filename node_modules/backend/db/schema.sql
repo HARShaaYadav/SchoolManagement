@@ -70,10 +70,15 @@ create table if not exists attendance (
   student_id bigint not null references students(id) on delete cascade,
   class_id bigint not null references classes(id),
   date date not null,
+  subject text not null default 'General',
   status text not null check (status in ('present', 'absent')),
   marked_by_user_id bigint null references users(id) on delete set null,
-  unique (student_id, date)
+  unique (student_id, date, subject)
 );
+
+alter table attendance add column if not exists subject text not null default 'General';
+alter table attendance drop constraint if exists attendance_student_id_date_key;
+alter table attendance add constraint attendance_student_id_date_subject_key unique (student_id, date, subject);
 
 create index if not exists idx_attendance_student_id on attendance(student_id);
 create index if not exists idx_attendance_date on attendance(date);

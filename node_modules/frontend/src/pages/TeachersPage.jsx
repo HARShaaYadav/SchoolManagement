@@ -6,6 +6,7 @@ const emptyTeacherForm = {
   name: '',
   email: '',
   password: '',
+  subject: '',
 }
 
 export function TeachersPage() {
@@ -85,11 +86,12 @@ export function TeachersPage() {
       {error ? <Message>{error}</Message> : null}
 
       <Panel title="Create teacher account" subtitle="New teacher accounts automatically require a password change on first login.">
-        <form onSubmit={createTeacher} className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <form onSubmit={createTeacher} className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
           <Field label="Full Name" value={form.name} onChange={(value) => setForm((current) => ({ ...current, name: value }))} placeholder="Teacher name" />
           <Field label="Email" type="email" value={form.email} onChange={(value) => setForm((current) => ({ ...current, email: value }))} placeholder="teacher@school.edu" />
+          <Field label="Subject" value={form.subject} onChange={(value) => setForm((current) => ({ ...current, subject: value }))} placeholder="e.g. Mathematics" />
           <Field label="Temporary Password" type="password" value={form.password} onChange={(value) => setForm((current) => ({ ...current, password: value }))} placeholder="Create a temporary password" />
-          <div className="md:col-span-3">
+          <div className="md:col-span-2 xl:col-span-4">
             <button disabled={saving} className="app-button">
               {saving ? 'Saving...' : 'Create teacher'}
             </button>
@@ -99,13 +101,14 @@ export function TeachersPage() {
 
       <Panel title="Teacher accounts" subtitle="Track onboarding status and trigger secure password resets when needed.">
         <DataTable
-          columns={['Name', 'Email', 'Status', 'Reset Password']}
+          columns={['Name', 'Email', 'Subject', 'Status', 'Reset Password']}
           rows={teachers}
           empty={loading ? 'Loading teacher accounts...' : 'No teacher accounts yet'}
           renderRow={(teacher) => (
             <tr key={teacher.id}>
               <td className="font-semibold text-slate-900">{teacher.name}</td>
               <td>{teacher.email}</td>
+              <td>{teacher.subject || 'Not assigned'}</td>
               <td>
                 {teacher.must_change_password ? <Pill tone="amber">Password change required</Pill> : <Pill tone="emerald">Active</Pill>}
               </td>

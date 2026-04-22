@@ -25,7 +25,16 @@ authRouter.post(
         email: z.string().email(),
         password: z.string().min(6),
         role: z.enum(["admin", "teacher"]),
+        subject: z.string().trim().min(1).optional(),
         adminVerificationToken: z.string().min(1).optional(),
+      }).superRefine((body, ctx) => {
+        if (body.role === "teacher" && !body.subject) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["subject"],
+            message: "Subject is required for teacher accounts",
+          });
+        }
       }),
     }),
   ),

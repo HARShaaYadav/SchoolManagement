@@ -23,7 +23,10 @@ const links = {
     ['/results', 'Results'],
     ['/student-profile', 'Student Profile'],
   ],
-  student: [['/student-profile', 'Student Profile']],
+  student: [
+    ['/student-profile', 'Student Profile'],
+    ['/attendance', 'Attendance'],
+  ],
 }
 
 export function Layout() {

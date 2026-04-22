@@ -99,7 +99,7 @@ export default function App() {
             <Route
               path="attendance"
               element={
-                <RequireRoles roles={['admin', 'teacher']}>
+                <RequireRoles roles={['admin', 'teacher', 'student']}>
                   <AttendancePage />
                 </RequireRoles>
               }

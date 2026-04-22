@@ -11,6 +11,30 @@ function buildStudentEmail(admissionId) {
   return `${String(admissionId).trim().toLowerCase()}@student.local`;
 }
 
+async function getTeacherProfileByUserId(userId, client = pool) {
+  const result = await client.query(
+    `select id, subject, assigned_class, assigned_class_id
+     from teachers
+     where user_id = $1`,
+    [userId],
+  );
+
+  return result.rows[0] || null;
+}
+
+async function attachTeacherProfile(user, client = pool) {
+  if (user.role !== "teacher") return user;
+
+  const teacher = await getTeacherProfileByUserId(user.id, client);
+  return {
+    ...user,
+    teacher_id: teacher?.id ?? null,
+    subject: teacher?.subject ?? null,
+    assigned_class: teacher?.assigned_class ?? null,
+    assigned_class_id: teacher?.assigned_class_id ?? null,
+  };
+}
+
 function signToken(user) {
   const secret = process.env.JWT_SECRET;
   if (!secret) throw new Error("JWT_SECRET is required");
@@ -23,6 +47,10 @@ function signToken(user) {
       role: user.role,
       admissionId: user.admission_id ?? null,
       mustChangePassword: Boolean(user.must_change_password),
+      teacherId: user.teacher_id ?? null,
+      subject: user.subject ?? null,
+      assignedClass: user.assigned_class ?? null,
+      assignedClassId: user.assigned_class_id ?? null,
     },
     secret,
     { expiresIn: "7d" },
@@ -56,9 +84,11 @@ function verifyAdminVerificationToken(token) {
 }
 
 export async function register(req, res, next) {
+  const client = await pool.connect();
+  let transactionStarted = false;
   try {
-    const { name, email, password, role, adminVerificationToken } = req.validated.body;
-    const adminCount = await pool.query("select count(*)::int as count from users where role = 'admin'");
+    const { name, email, password, role, subject, adminVerificationToken } = req.validated.body;
+    const adminCount = await client.query("select count(*)::int as count from users where role = 'admin'");
     const isBootstrap = adminCount.rows[0]?.count === 0;
 
     if (!isBootstrap) {
@@ -89,22 +119,39 @@ export async function register(req, res, next) {
     }
 
     const normalizedEmail = normalizeEmail(email);
-    const existing = await pool.query("select id from users where lower(email) = $1", [normalizedEmail]);
+    const existing = await client.query("select id from users where lower(email) = $1", [normalizedEmail]);
     if (existing.rowCount > 0) return res.status(409).json({ error: "Email already in use" });
 
+    await client.query("begin");
+    transactionStarted = true;
+
     const passwordHash = await bcrypt.hash(password, 10);
-    const created = await pool.query(
+    const created = await client.query(
       `insert into users (name, email, password_hash, role, must_change_password)
        values ($1, $2, $3, $4, $5)
        returning id, name, email, role, admission_id, must_change_password, created_at`,
       [name, normalizedEmail, passwordHash, role, role === "teacher"],
     );
 
-    const user = created.rows[0];
+    if (role === "teacher") {
+      await client.query(
+        `insert into teachers (user_id, subject, assigned_class)
+         values ($1, $2, $3)`,
+        [created.rows[0].id, subject.trim(), "Unassigned"],
+      );
+    }
+
+    await client.query("commit");
+    transactionStarted = false;
+
+    const user = await attachTeacherProfile(created.rows[0], client);
     const token = signToken(user);
     return res.status(201).json({ token, user });
   } catch (e) {
+    if (transactionStarted) await client.query("rollback");
     return next(e);
+  } finally {
+    client.release();
   }
 }
 
@@ -175,7 +222,7 @@ export async function login(req, res, next) {
           );
     if (result.rowCount === 0) return res.status(401).json({ error: "Invalid credentials" });
 
-    const user = result.rows[0];
+    const user = await attachTeacherProfile(result.rows[0]);
     const ok = await bcrypt.compare(password, user.password_hash);
     if (!ok) return res.status(401).json({ error: "Invalid credentials" });
 
@@ -222,7 +269,7 @@ export async function changePassword(req, res, next) {
       [nextHash, req.user.id],
     );
 
-    const safeUser = updated.rows[0];
+    const safeUser = await attachTeacherProfile(updated.rows[0]);
     const token = signToken(safeUser);
     return res.json({ token, user: safeUser });
   } catch (e) {
@@ -269,9 +316,20 @@ export async function forgotPassword(req, res, next) {
 export async function listTeachers(_req, res, next) {
   try {
     const result = await pool.query(
-      `select id, name, email, role, must_change_password, created_at
-       from users
-       where role = 'teacher'
+      `select
+        u.id,
+        u.name,
+        u.email,
+        u.role,
+        u.must_change_password,
+        u.created_at,
+        t.id as teacher_id,
+        t.subject,
+        t.assigned_class,
+        t.assigned_class_id
+       from users u
+       left join teachers t on t.user_id = u.id
+       where u.role = 'teacher'
        order by name asc`,
     );
     return res.json({ teachers: result.rows });

@@ -17,6 +17,7 @@ attendanceRouter.post(
         student_id: z.number().int().positive(),
         class_id: z.number().int().positive(),
         date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+        subject: z.string().trim().min(1),
         status: z.enum(["present", "absent"]),
       }),
     }),
