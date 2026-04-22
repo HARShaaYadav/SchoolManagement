@@ -3,12 +3,13 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { api } from '../services/api.js'
 import { useAuth } from '../auth/useAuth.js'
 import { useClassSelection } from '../class/useClassSelection.js'
-import { DataTable, Field, Message, PageIntro, Panel, ReadOnlyField } from '../components/ui.jsx'
+import { DataTable, Field, Message, PageIntro, Panel, SelectField } from '../components/ui.jsx'
 
 const emptyForm = {
   admission_id: '',
   full_name: '',
   password: '',
+  class_id: '',
   phone_number: '',
   blood_group: '',
   profile_photo_url: '',
@@ -20,7 +21,7 @@ const emptyForm = {
 export function StudentsPage() {
   const { user } = useAuth()
   const [searchParams, setSearchParams] = useSearchParams()
-  const { selectedClassId, selectedClass } = useClassSelection()
+  const { classes, selectedClassId, selectedClass } = useClassSelection()
   const [students, setStudents] = useState([])
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
@@ -49,6 +50,15 @@ export function StudentsPage() {
   }, [load])
 
   useEffect(() => {
+    if (!editingId && selectedClassId) {
+      setForm((current) => ({
+        ...current,
+        class_id: String(selectedClassId),
+      }))
+    }
+  }, [editingId, selectedClassId])
+
+  useEffect(() => {
     const admissionId = searchParams.get('edit')
     if (!admissionId || students.length === 0) return
 
@@ -60,6 +70,7 @@ export function StudentsPage() {
       admission_id: student.admission_id ?? '',
       full_name: student.name ?? '',
       password: '',
+      class_id: String(student.class_id ?? ''),
       phone_number: student.phone_number ?? '',
       blood_group: student.blood_group ?? '',
       profile_photo_url: student.profile_photo_url ?? '',
@@ -77,7 +88,7 @@ export function StudentsPage() {
     try {
       const payload = {
         ...form,
-        class_id: Number(selectedClassId),
+        class_id: Number(form.class_id),
       }
 
       if (!payload.phone_number.trim()) delete payload.phone_number
@@ -130,7 +141,7 @@ export function StudentsPage() {
                 className="app-button-secondary"
                 onClick={() => {
                   setEditingId(null)
-                  setForm(emptyForm)
+                  setForm({ ...emptyForm, class_id: selectedClassId ? String(selectedClassId) : '' })
                   setSearchParams({})
                 }}
               >
@@ -149,10 +160,18 @@ export function StudentsPage() {
               onChange={(value) => setForm((current) => ({ ...current, password: value }))}
               placeholder={editingId ? 'Leave blank to keep current password' : 'Temporary password'}
             />
-            <ReadOnlyField
+            <SelectField
               label="Class"
-              value={selectedClass ? `Class ${selectedClass.class_name} - Section ${selectedClass.section}` : 'Pick a class from the header'}
-            />
+              value={form.class_id}
+              onChange={(value) => setForm((current) => ({ ...current, class_id: value }))}
+            >
+              <option value="">Select class</option>
+              {classes.map((klass) => (
+                <option key={klass.id} value={klass.id}>
+                  {klass.section ? `Class ${klass.class_name} - Section ${klass.section}` : `Class ${klass.class_name}`}
+                </option>
+              ))}
+            </SelectField>
             <Field label="Phone Number" value={form.phone_number} onChange={(value) => setForm((current) => ({ ...current, phone_number: value }))} placeholder="+91..." />
             <Field label="Blood Group" value={form.blood_group} onChange={(value) => setForm((current) => ({ ...current, blood_group: value }))} placeholder="B+" />
             <Field label="Profile Photo URL" value={form.profile_photo_url} onChange={(value) => setForm((current) => ({ ...current, profile_photo_url: value }))} placeholder="https://..." className="md:col-span-2" />
@@ -161,7 +180,7 @@ export function StudentsPage() {
             <Field label="Address" value={form.address} onChange={(value) => setForm((current) => ({ ...current, address: value }))} placeholder="Home address" className="xl:col-span-2" />
 
             <div className="md:col-span-2 xl:col-span-3">
-              <button disabled={saving || !selectedClassId} className="app-button">
+              <button disabled={saving || !form.class_id} className="app-button">
                 {saving ? 'Saving...' : editingId ? 'Update student' : 'Create student'}
               </button>
             </div>
@@ -194,14 +213,15 @@ export function StudentsPage() {
                     type="button"
                     className="app-button px-3 py-2 text-xs"
                     onClick={() => {
-                      setEditingId(student.id)
-                      setForm({
-                        admission_id: student.admission_id ?? '',
-                        full_name: student.name ?? '',
-                        password: '',
-                        phone_number: student.phone_number ?? '',
-                        blood_group: student.blood_group ?? '',
-                        profile_photo_url: student.profile_photo_url ?? '',
+                            setEditingId(student.id)
+                            setForm({
+                              admission_id: student.admission_id ?? '',
+                              full_name: student.name ?? '',
+                              password: '',
+                              class_id: String(student.class_id ?? ''),
+                              phone_number: student.phone_number ?? '',
+                              blood_group: student.blood_group ?? '',
+                              profile_photo_url: student.profile_photo_url ?? '',
                         parent_name: student.parent_name ?? '',
                         parent_contact: student.parent_contact ?? '',
                         address: student.address ?? '',
