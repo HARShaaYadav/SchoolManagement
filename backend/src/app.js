@@ -9,6 +9,7 @@ import { attendanceRouter } from "./routes/attendance.js";
 import { feesRouter } from "./routes/fees.js";
 import { examsRouter } from "./routes/exams.js";
 import { resultsRouter } from "./routes/results.js";
+import { syllabusRouter } from "./routes/syllabus.js";
 import { errorHandler, notFound } from "./middleware/error.js";
 
 export const app = express();
@@ -38,6 +39,7 @@ app.use("/api/attendance", attendanceRouter);
 app.use("/api/fees", feesRouter);
 app.use("/api/exams", examsRouter);
 app.use("/api/results", resultsRouter);
+app.use("/api/syllabus", syllabusRouter);
 
 app.use(notFound);
 app.use(errorHandler);

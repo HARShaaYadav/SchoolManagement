@@ -78,7 +78,18 @@ create table if not exists attendance (
 
 alter table attendance add column if not exists subject text not null default 'General';
 alter table attendance drop constraint if exists attendance_student_id_date_key;
-alter table attendance add constraint attendance_student_id_date_subject_key unique (student_id, date, subject);
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_constraint
+    where conname = 'attendance_student_id_date_subject_key'
+  ) then
+    alter table attendance
+      add constraint attendance_student_id_date_subject_key unique (student_id, date, subject);
+  end if;
+end
+$$;
 
 create index if not exists idx_attendance_student_id on attendance(student_id);
 create index if not exists idx_attendance_date on attendance(date);
@@ -107,6 +118,19 @@ create table if not exists exams (
 );
 
 create index if not exists idx_exams_class_id on exams(class_id);
+
+create table if not exists syllabus (
+  id bigserial primary key,
+  class_id bigint not null references classes(id),
+  class text not null,
+  subject text not null,
+  title text not null,
+  description text not null,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_syllabus_class_id on syllabus(class_id);
+create index if not exists idx_syllabus_subject on syllabus(subject);
 
 create table if not exists results (
   id bigserial primary key,

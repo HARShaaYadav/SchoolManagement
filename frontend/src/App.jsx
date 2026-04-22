@@ -13,6 +13,7 @@ import { ExamsPage } from './pages/ExamsPage.jsx'
 import { ResultsPage } from './pages/ResultsPage.jsx'
 import { StudentProfilePage } from './pages/StudentProfilePage.jsx'
 import { TeachersPage } from './pages/TeachersPage.jsx'
+import { SyllabusPage } from './pages/SyllabusPage.jsx'
 
 function AuthenticatedOnly({ children }) {
   const { token } = useAuth()
@@ -101,6 +102,14 @@ export default function App() {
               element={
                 <RequireRoles roles={['admin', 'teacher', 'student']}>
                   <AttendancePage />
+                </RequireRoles>
+              }
+            />
+            <Route
+              path="syllabus"
+              element={
+                <RequireRoles roles={['admin', 'teacher', 'student']}>
+                  <SyllabusPage />
                 </RequireRoles>
               }
             />

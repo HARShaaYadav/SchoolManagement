@@ -9,6 +9,7 @@ const links = {
     ['/teachers', 'Teachers'],
     ['/students', 'Students'],
     ['/attendance', 'Attendance'],
+    ['/syllabus', 'Syllabus'],
     ['/fees', 'Fees'],
     ['/exams', 'Exams'],
     ['/results', 'Results'],
@@ -18,6 +19,7 @@ const links = {
     ['/', 'Dashboard'],
     ['/students', 'Students'],
     ['/attendance', 'Attendance'],
+    ['/syllabus', 'Syllabus'],
     ['/fees', 'Fees'],
     ['/exams', 'Exams'],
     ['/results', 'Results'],
@@ -26,6 +28,7 @@ const links = {
   student: [
     ['/student-profile', 'Student Profile'],
     ['/attendance', 'Attendance'],
+    ['/syllabus', 'Syllabus'],
   ],
 }
 
@@ -37,12 +40,12 @@ export function Layout() {
   const roleLinks = links[user?.role] || []
 
   return (
-    <div className="min-h-full px-4 py-4 md:px-6 md:py-6">
+    <div className="workspace-shell min-h-full px-4 py-4 md:px-6 md:py-6">
       <div className="mx-auto flex max-w-7xl flex-col gap-6">
         <header className="hero-panel">
           <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
             <div className="flex items-start gap-4">
-              <div className="grid h-14 w-14 place-items-center rounded-[1.4rem] bg-gradient-to-br from-teal-700 to-teal-950 text-lg font-bold text-white shadow-lg shadow-teal-900/20">
+              <div className="grid h-14 w-14 place-items-center rounded-[1.4rem] bg-gradient-to-br from-sky-600 to-blue-900 text-lg font-bold text-white shadow-lg shadow-sky-900/20">
                 SM
               </div>
               <div>
@@ -93,11 +96,11 @@ export function Layout() {
         </header>
 
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-[280px_minmax(0,1fr)]">
-          <aside className="app-panel h-fit">
+          <aside className="workspace-nav h-fit">
             <div className="panel-head mb-4">
               <div>
                 <h2 className="panel-title">Workspace</h2>
-                <p className="panel-subtitle">Jump between modules with role-based access.</p>
+                <p className="panel-subtitle">Everything important, grouped into one cleaner navigation rail.</p>
               </div>
             </div>
             <div className="space-y-2">
@@ -108,10 +111,10 @@ export function Layout() {
                   end={path === '/'}
                   className={({ isActive }) =>
                     [
-                      'block rounded-2xl px-4 py-3 text-sm font-semibold transition',
+                      'workspace-nav-link',
                       isActive
-                        ? 'bg-gradient-to-r from-teal-700 to-teal-900 text-white shadow-lg shadow-teal-900/20'
-                        : 'text-slate-700 hover:bg-white/80 hover:text-slate-950',
+                        ? 'workspace-nav-link-active'
+                        : 'workspace-nav-link-idle',
                     ].join(' ')
                   }
                 >

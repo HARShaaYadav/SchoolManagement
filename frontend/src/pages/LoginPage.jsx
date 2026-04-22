@@ -2,12 +2,12 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../services/api.js'
 import { useAuth } from '../auth/useAuth.js'
-import { Field, Message, Pill, SelectField } from '../components/ui.jsx'
+import { Field, Message, Pill } from '../components/ui.jsx'
 
 const roles = [
-  { value: 'admin', label: 'Admin', hint: 'Full system access' },
-  { value: 'teacher', label: 'Teacher', hint: 'Manage student records' },
-  { value: 'student', label: 'Student', hint: 'View your own profile' },
+  { value: 'admin', label: 'Admin' },
+  { value: 'teacher', label: 'Teacher' },
+  { value: 'student', label: 'Student' },
 ]
 
 export function LoginPage() {
@@ -110,24 +110,46 @@ export function LoginPage() {
   const showAdminRegister = role === 'admin'
 
   return (
-    <div className="min-h-full px-4 py-6 md:px-8 md:py-8">
+    <div className="auth-shell min-h-full px-4 py-6 md:px-8 md:py-8">
       <div className="mx-auto grid min-h-[calc(100vh-4rem)] max-w-5xl place-items-center">
         <div className="grid w-full gap-6 lg:grid-cols-[0.95fr_1.05fr]">
-          <section className="hero-panel flex flex-col justify-center">
-            <div className="hero-eyebrow">School Management System</div>
-            <h1 className="hero-title">
-              {mode === 'register' ? 'Admin Registration' : mode === 'forgot' ? 'Reset Password' : 'Login Portal'}
-            </h1>
-            <p className="hero-copy">
-              {mode === 'register'
-                ? 'A new admin can only be registered after an existing admin verifies the request.'
-                : mode === 'forgot'
-                  ? 'Reset your password using your role and login identifier.'
-                  : 'Secure access for administrators, teachers, and students.'}
-            </p>
+          <section className="auth-showcase flex flex-col justify-between">
+            <div>
+              <div className="hero-eyebrow">School Management System</div>
+              <h1 className="hero-title">
+                {mode === 'register' ? 'Control Center Access' : mode === 'forgot' ? 'Recover Your Account' : 'A school portal that feels current'}
+              </h1>
+              <p className="hero-copy">
+                {mode === 'register'
+                  ? 'Set up a new administrator after verification from an existing admin.'
+                  : mode === 'forgot'
+                    ? 'Reset access quickly with your role and login details.'
+                    : 'Attendance, classes, fees, results, and profiles in one streamlined workspace.'}
+              </p>
+            </div>
+
+            <div className="auth-metric-grid">
+              <div className="auth-metric-card">
+                <div className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">Fast Access</div>
+                <div className="mt-2 text-lg font-bold text-slate-900">Admin, Teacher, Student</div>
+              </div>
+              <div className="auth-metric-card">
+                <div className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">Modules</div>
+                <div className="mt-2 text-lg font-bold text-slate-900">Attendance, Fees, Results</div>
+              </div>
+              <div className="auth-metric-card">
+                <div className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">Scope</div>
+                <div className="mt-2 text-lg font-bold text-slate-900">Class-wise workflow</div>
+              </div>
+              <div className="auth-metric-card">
+                <div className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">Design</div>
+                <div className="mt-2 text-lg font-bold text-slate-900">Cleaner and easier to scan</div>
+              </div>
+            </div>
           </section>
 
-          <section className="app-panel flex flex-col justify-center">
+          <section className="auth-card flex flex-col justify-center">
+            <div className="hero-eyebrow">School Management System</div>
             <div className="mb-6">
               <div className="hero-eyebrow">
                 {mode === 'register' ? 'Register' : mode === 'forgot' ? 'Forgot Password' : 'Login'}
@@ -138,28 +160,36 @@ export function LoginPage() {
             </div>
 
             <form onSubmit={submit} className="space-y-4">
-              <SelectField
-                label="Are You"
-                value={role}
-                onChange={(value) => {
-                  setRole(value)
-                  setError('')
-                  setSuccess('')
-                  if (value !== 'admin' && mode === 'register') setMode('login')
-                }}
-              >
-                {roles.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </SelectField>
-
-              <div className="rounded-[1.2rem] border border-slate-200/70 bg-white/60 px-4 py-3">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="font-semibold text-slate-900">{activeRole.label}</div>
-                  <Pill>{activeRole.hint}</Pill>
+              <div>
+                <label className="field-label">Are You</label>
+                <div className="auth-segment">
+                  {roles.map((option) => {
+                    const isActive = option.value === role
+                    return (
+                      <button
+                        key={option.value}
+                        type="button"
+                        className={[
+                          'auth-segment-button',
+                          isActive ? 'auth-segment-button-active' : 'auth-segment-button-idle',
+                        ].join(' ')}
+                        onClick={() => {
+                          setRole(option.value)
+                          setError('')
+                          setSuccess('')
+                          if (option.value !== 'admin' && mode === 'register') setMode('login')
+                        }}
+                      >
+                        {option.label}
+                      </button>
+                    )
+                  })}
                 </div>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                <Pill>{activeRole.label}</Pill>
+                <Pill tone="amber">{mode === 'register' ? 'Verification Flow' : mode === 'forgot' ? 'Password Recovery' : 'Secure Sign In'}</Pill>
               </div>
 
               {mode === 'register' ? (

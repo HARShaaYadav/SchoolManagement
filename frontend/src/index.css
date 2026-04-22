@@ -6,17 +6,23 @@
 
 @layer base {
   :root {
-    --app-bg: #f5efe4;
-    --app-paper: rgba(255, 252, 247, 0.82);
-    --app-paper-strong: #fffdf8;
-    --app-ink: #1f2a2a;
-    --app-muted: #5e6d68;
-    --app-line: rgba(39, 59, 56, 0.12);
-    --app-accent: #0f766e;
-    --app-accent-deep: #134e4a;
+    --app-bg: #f3f7fb;
+    --app-bg-deep: #e8eef7;
+    --app-paper: rgba(255, 255, 255, 0.92);
+    --app-paper-strong: #ffffff;
+    --app-ink: #122033;
+    --app-ink-soft: #24354d;
+    --app-muted: #617289;
+    --app-line: rgba(61, 89, 125, 0.14);
+    --app-line-strong: rgba(61, 89, 125, 0.24);
+    --app-accent: #0f6cbd;
+    --app-accent-deep: #0b4f8a;
+    --app-accent-soft: #dbeafe;
     --app-warm: #f59e0b;
-    --app-danger: #b91c1c;
-    --app-shadow: 0 28px 80px rgba(25, 38, 37, 0.12);
+    --app-danger: #dc2626;
+    --app-success: #0f9f6e;
+    --app-shadow: 0 24px 70px rgba(21, 34, 54, 0.08);
+    --app-shadow-strong: 0 18px 40px rgba(15, 27, 46, 0.1);
   }
 
   html,
@@ -28,9 +34,10 @@
   body {
     font-family: 'Space Grotesk', 'Avenir Next', 'Segoe UI', sans-serif;
     background:
-      radial-gradient(circle at top left, rgba(15, 118, 110, 0.16), transparent 28%),
-      radial-gradient(circle at top right, rgba(245, 158, 11, 0.16), transparent 24%),
-      linear-gradient(180deg, #faf6ee 0%, var(--app-bg) 100%);
+      radial-gradient(circle at top left, rgba(15, 108, 189, 0.14), transparent 24%),
+      radial-gradient(circle at 85% 15%, rgba(8, 145, 178, 0.16), transparent 20%),
+      radial-gradient(circle at 50% 100%, rgba(148, 163, 184, 0.18), transparent 30%),
+      linear-gradient(180deg, #f8fbff 0%, var(--app-bg) 52%, var(--app-bg-deep) 100%);
     color: var(--app-ink);
     @apply antialiased;
   }
@@ -41,17 +48,17 @@
   }
 
   ::selection {
-    background: rgba(15, 118, 110, 0.18);
+    background: rgba(15, 108, 189, 0.16);
   }
 }
 
 @layer components {
   .hero-panel {
     position: relative;
-    border: 1px solid rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.78);
     background:
-      linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(255, 248, 236, 0.88)),
-      linear-gradient(120deg, rgba(15, 118, 110, 0.12), rgba(245, 158, 11, 0.12));
+      linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(245, 249, 255, 0.95)),
+      linear-gradient(120deg, rgba(15, 108, 189, 0.08), rgba(8, 145, 178, 0.08));
     box-shadow: var(--app-shadow);
     @apply rounded-[2rem] p-6 md:p-8;
   }
@@ -59,10 +66,22 @@
   .hero-panel::after {
     content: '';
     position: absolute;
-    inset: auto -2rem -2rem auto;
-    width: 12rem;
-    height: 12rem;
-    background: radial-gradient(circle, rgba(15, 118, 110, 0.18), transparent 70%);
+    inset: auto -1rem -1rem auto;
+    width: 14rem;
+    height: 14rem;
+    background: radial-gradient(circle, rgba(15, 108, 189, 0.14), transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(15, 108, 189, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(15, 108, 189, 0.04) 1px, transparent 1px);
+    background-size: 22px 22px;
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.4), transparent 85%);
     pointer-events: none;
   }
 
@@ -76,7 +95,8 @@
   }
 
   .hero-title {
-    @apply text-3xl font-bold tracking-tight md:text-4xl;
+    color: var(--app-ink);
+    @apply text-3xl font-bold tracking-tight md:text-5xl;
   }
 
   .hero-copy {
@@ -92,8 +112,8 @@
   .app-panel {
     border: 1px solid var(--app-line);
     background: var(--app-paper);
-    backdrop-filter: blur(18px);
-    box-shadow: 0 16px 40px rgba(26, 39, 38, 0.07);
+    backdrop-filter: blur(10px);
+    box-shadow: var(--app-shadow-strong);
     @apply rounded-[1.6rem] p-5 md:p-6;
   }
 
@@ -102,6 +122,7 @@
   }
 
   .panel-title {
+    color: var(--app-ink);
     @apply text-lg font-bold;
   }
 
@@ -111,25 +132,37 @@
   }
 
   .stat-card {
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    box-shadow: 0 12px 34px rgba(20, 29, 28, 0.08);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 14px 34px rgba(20, 29, 44, 0.08);
     @apply rounded-[1.5rem] p-5 transition duration-300 hover:-translate-y-1;
   }
 
   .stat-default {
-    background: linear-gradient(160deg, rgba(255, 255, 255, 0.9), rgba(239, 246, 245, 0.82));
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.94), rgba(240, 247, 255, 0.88));
   }
 
   .stat-emerald {
-    background: linear-gradient(160deg, rgba(209, 250, 229, 0.95), rgba(240, 253, 250, 0.82));
+    background: linear-gradient(160deg, rgba(220, 252, 231, 0.96), rgba(240, 253, 248, 0.88));
   }
 
   .stat-amber {
-    background: linear-gradient(160deg, rgba(254, 243, 199, 0.95), rgba(255, 251, 235, 0.82));
+    background: linear-gradient(160deg, rgba(254, 243, 199, 0.97), rgba(255, 251, 235, 0.9));
   }
 
   .stat-rose {
-    background: linear-gradient(160deg, rgba(255, 228, 230, 0.95), rgba(255, 241, 242, 0.82));
+    background: linear-gradient(160deg, rgba(255, 228, 230, 0.97), rgba(255, 241, 242, 0.9));
+  }
+
+  .stat-card::after {
+    content: '';
+    position: absolute;
+    inset: auto -2rem -2rem auto;
+    width: 6rem;
+    height: 6rem;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.7), transparent 70%);
+    pointer-events: none;
   }
 
   .stat-label {
@@ -147,27 +180,32 @@
   }
 
   .app-pill {
-    @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.24em];
+    border: 1px solid transparent;
+    @apply inline-flex items-center rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-[0.24em];
   }
 
   .pill-default {
-    background: rgba(15, 118, 110, 0.1);
+    background: rgba(15, 108, 189, 0.1);
     color: var(--app-accent-deep);
+    border-color: rgba(15, 108, 189, 0.12);
   }
 
   .pill-amber {
     background: rgba(245, 158, 11, 0.14);
     color: #9a5a00;
+    border-color: rgba(245, 158, 11, 0.15);
   }
 
   .pill-emerald {
-    background: rgba(16, 185, 129, 0.14);
-    color: #0f766e;
+    background: rgba(16, 185, 129, 0.12);
+    color: #0c7a56;
+    border-color: rgba(16, 185, 129, 0.14);
   }
 
   .pill-rose {
     background: rgba(244, 63, 94, 0.12);
     color: #be123c;
+    border-color: rgba(244, 63, 94, 0.14);
   }
 
   .app-message {
@@ -198,15 +236,16 @@
   .field-input,
   .field-static {
     min-height: 3rem;
-    border: 1px solid rgba(42, 61, 59, 0.14);
-    background: rgba(255, 255, 255, 0.88);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
-    @apply w-full rounded-2xl px-4 py-3 text-sm outline-none transition;
+    border: 1px solid rgba(61, 89, 125, 0.14);
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    color: var(--app-ink);
+    @apply w-full rounded-[1.1rem] px-4 py-3 text-sm outline-none transition;
   }
 
   .field-input:focus {
-    border-color: rgba(15, 118, 110, 0.42);
-    box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.08);
+    border-color: rgba(15, 108, 189, 0.45);
+    box-shadow: 0 0 0 4px rgba(15, 108, 189, 0.1);
   }
 
   .field-static {
@@ -217,21 +256,21 @@
   .app-button {
     background: linear-gradient(135deg, var(--app-accent), var(--app-accent-deep));
     color: white;
-    box-shadow: 0 12px 24px rgba(15, 118, 110, 0.22);
-    @apply inline-flex items-center justify-center rounded-2xl px-4 py-3 text-sm font-bold transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60;
+    box-shadow: 0 12px 24px rgba(15, 108, 189, 0.24);
+    @apply inline-flex items-center justify-center rounded-[1.1rem] px-4 py-3 text-sm font-bold transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60;
   }
 
   .app-button-secondary {
-    border: 1px solid rgba(42, 61, 59, 0.12);
-    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(61, 89, 125, 0.14);
+    background: rgba(255, 255, 255, 0.84);
     color: var(--app-ink);
-    @apply inline-flex items-center justify-center rounded-2xl px-4 py-3 text-sm font-bold transition hover:bg-white;
+    @apply inline-flex items-center justify-center rounded-[1.1rem] px-4 py-3 text-sm font-bold transition hover:bg-white;
   }
 
   .table-shell {
     overflow: hidden;
     border: 1px solid var(--app-line);
-    background: rgba(255, 255, 255, 0.75);
+    background: rgba(255, 255, 255, 0.84);
     @apply rounded-[1.4rem];
   }
 
@@ -240,7 +279,7 @@
   }
 
   .app-table thead {
-    background: rgba(245, 248, 247, 0.95);
+    background: rgba(241, 246, 252, 0.96);
     color: var(--app-muted);
   }
 
@@ -253,7 +292,7 @@
   }
 
   .app-table tbody tr {
-    border-top: 1px solid rgba(42, 61, 59, 0.08);
+    border-top: 1px solid rgba(61, 89, 125, 0.08);
     @apply transition hover:bg-white/75;
   }
 
@@ -268,5 +307,143 @@
 
   .content-grid {
     @apply grid grid-cols-1 gap-4 xl:grid-cols-2;
+  }
+
+  .workspace-shell {
+    position: relative;
+  }
+
+  .workspace-shell::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(circle at 15% 15%, rgba(15, 108, 189, 0.12), transparent 22%),
+      radial-gradient(circle at 85% 85%, rgba(8, 145, 178, 0.12), transparent 22%);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .workspace-nav {
+    border: 1px solid rgba(255, 255, 255, 0.74);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(243, 248, 255, 0.84));
+    box-shadow: var(--app-shadow-strong);
+    @apply rounded-[1.8rem] p-4;
+  }
+
+  .workspace-nav-link {
+    border: 1px solid transparent;
+    @apply block rounded-[1rem] px-4 py-3 text-sm font-semibold transition;
+  }
+
+  .workspace-nav-link-active {
+    background: linear-gradient(135deg, #0f6cbd, #0b4f8a);
+    color: white;
+    box-shadow: 0 14px 28px rgba(15, 108, 189, 0.22);
+  }
+
+  .workspace-nav-link-idle {
+    color: var(--app-ink-soft);
+    background: rgba(255, 255, 255, 0.42);
+    border-color: rgba(61, 89, 125, 0.08);
+  }
+
+  .workspace-nav-link-idle:hover {
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--app-ink);
+  }
+
+  .dashboard-action-card {
+    border: 1px solid rgba(61, 89, 125, 0.1);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(245, 248, 252, 0.84));
+    @apply rounded-[1.25rem] px-4 py-4 text-sm text-slate-700;
+  }
+
+  .mini-info {
+    border: 1px solid rgba(61, 89, 125, 0.1);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(243, 248, 255, 0.84));
+    @apply rounded-[1.4rem] px-4 py-4;
+  }
+
+  .auth-shell {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .auth-shell::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(15, 108, 189, 0.14), transparent 30%),
+      radial-gradient(circle at 80% 80%, rgba(8, 145, 178, 0.12), transparent 26%);
+    pointer-events: none;
+  }
+
+  .auth-showcase {
+    position: relative;
+    min-height: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.82);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(241, 247, 255, 0.88)),
+      linear-gradient(135deg, rgba(15, 108, 189, 0.08), rgba(8, 145, 178, 0.08));
+    box-shadow: var(--app-shadow);
+    @apply rounded-[2rem] p-8 md:p-10;
+  }
+
+  .auth-showcase::after {
+    content: '';
+    position: absolute;
+    inset: auto 2rem 2rem auto;
+    width: 9rem;
+    height: 9rem;
+    border-radius: 9999px;
+    background: radial-gradient(circle, rgba(15, 108, 189, 0.14), transparent 70%);
+  }
+
+  .auth-metric-grid {
+    @apply mt-10 grid grid-cols-2 gap-3;
+  }
+
+  .auth-metric-card {
+    border: 1px solid rgba(61, 89, 125, 0.1);
+    background: rgba(255, 255, 255, 0.74);
+    @apply rounded-[1.25rem] p-4;
+  }
+
+  .auth-card {
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.82);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(245, 249, 255, 0.88));
+    box-shadow: var(--app-shadow);
+    @apply rounded-[2rem] p-6 md:p-8;
+  }
+
+  .auth-segment {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem;
+    padding: 0.35rem;
+    border: 1px solid rgba(61, 89, 125, 0.12);
+    background: rgba(242, 247, 253, 0.92);
+    @apply rounded-[1.2rem];
+  }
+
+  .auth-segment-button {
+    @apply rounded-[0.95rem] px-3 py-3 text-sm font-semibold transition;
+  }
+
+  .auth-segment-button-active {
+    background: linear-gradient(135deg, #0f6cbd, #0b4f8a);
+    color: white;
+    box-shadow: 0 10px 20px rgba(15, 108, 189, 0.18);
+  }
+
+  .auth-segment-button-idle {
+    color: var(--app-ink-soft);
+  }
+
+  .auth-segment-button-idle:hover {
+    background: rgba(255, 255, 255, 0.7);
   }
 }

@@ -112,6 +112,7 @@ export function DashboardPage() {
                   'Create teacher accounts with temporary passwords and first-login resets.',
                   'Enroll students, add profile photos, and organize them by class.',
                   'Publish exams and monitor fee collections from one place.',
+                  'Add syllabus entries so each class has a clear subject-wise plan.',
                 ]
               : user?.role === 'teacher'
                 ? [
@@ -122,9 +123,9 @@ export function DashboardPage() {
                 : [
                     'Open your Student Profile card for the latest class and contact details.',
                     'Review fee status and follow up on any pending dues.',
-                    'Use results and attendance views to keep track of progress.',
+                  'Use results and attendance views to keep track of progress.',
                   ]).map((item) => (
-              <div key={item} className="rounded-2xl border border-white/60 bg-white/70 px-4 py-3 text-sm text-slate-700">
+              <div key={item} className="dashboard-action-card">
                 {item}
               </div>
             ))}
@@ -155,7 +156,7 @@ export function DashboardPage() {
 
 function MiniInfo({ title, value }) {
   return (
-    <div className="rounded-[1.4rem] border border-slate-200/70 bg-white/70 px-4 py-4">
+    <div className="mini-info">
       <div className="text-xs font-bold uppercase tracking-[0.22em] text-slate-500">{title}</div>
       <div className="mt-2 text-base font-semibold text-slate-900">{value}</div>
     </div>
