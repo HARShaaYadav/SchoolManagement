@@ -112,42 +112,7 @@ export function LoginPage() {
   return (
     <div className="auth-shell min-h-full px-4 py-6 md:px-8 md:py-8">
       <div className="mx-auto grid min-h-[calc(100vh-4rem)] max-w-5xl place-items-center">
-        <div className="grid w-full gap-6 lg:grid-cols-[0.95fr_1.05fr]">
-          <section className="auth-showcase flex flex-col justify-between">
-            <div>
-              <div className="hero-eyebrow">School Management System</div>
-              <h1 className="hero-title">
-                {mode === 'register' ? 'Control Center Access' : mode === 'forgot' ? 'Recover Your Account' : 'A school portal that feels current'}
-              </h1>
-              <p className="hero-copy">
-                {mode === 'register'
-                  ? 'Set up a new administrator after verification from an existing admin.'
-                  : mode === 'forgot'
-                    ? 'Reset access quickly with your role and login details.'
-                    : 'Attendance, classes, fees, results, and profiles in one streamlined workspace.'}
-              </p>
-            </div>
-
-            <div className="auth-metric-grid">
-              <div className="auth-metric-card">
-                <div className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">Fast Access</div>
-                <div className="mt-2 text-lg font-bold text-slate-900">Admin, Teacher, Student</div>
-              </div>
-              <div className="auth-metric-card">
-                <div className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">Modules</div>
-                <div className="mt-2 text-lg font-bold text-slate-900">Attendance, Fees, Results</div>
-              </div>
-              <div className="auth-metric-card">
-                <div className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">Scope</div>
-                <div className="mt-2 text-lg font-bold text-slate-900">Class-wise workflow</div>
-              </div>
-              <div className="auth-metric-card">
-                <div className="text-xs font-bold uppercase tracking-[0.24em] text-slate-500">Design</div>
-                <div className="mt-2 text-lg font-bold text-slate-900">Cleaner and easier to scan</div>
-              </div>
-            </div>
-          </section>
-
+        <div className="w-full max-w-2xl">
           <section className="auth-card flex flex-col justify-center">
             <div className="hero-eyebrow">School Management System</div>
             <div className="mb-6">
