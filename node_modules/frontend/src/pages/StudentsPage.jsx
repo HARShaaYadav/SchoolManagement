@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { api } from '../services/api.js'
 import { useAuth } from '../auth/useAuth.js'
@@ -28,6 +28,15 @@ export function StudentsPage() {
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState(emptyForm)
   const [editingId, setEditingId] = useState(null)
+
+  const classOptions = useMemo(() => {
+    const seen = new Set()
+    return classes.filter((klass) => {
+      if (seen.has(klass.class_name)) return false
+      seen.add(klass.class_name)
+      return true
+    })
+  }, [classes])
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -166,9 +175,9 @@ export function StudentsPage() {
               onChange={(value) => setForm((current) => ({ ...current, class_id: value }))}
             >
               <option value="">Select class</option>
-              {classes.map((klass) => (
+              {classOptions.map((klass) => (
                 <option key={klass.id} value={klass.id}>
-                  {klass.section ? `Class ${klass.class_name} - Section ${klass.section}` : `Class ${klass.class_name}`}
+                  {klass.class_name}
                 </option>
               ))}
             </SelectField>

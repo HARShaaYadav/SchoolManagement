@@ -36,6 +36,17 @@ async function ensureDefaultAdmin() {
   );
 }
 
+async function ensureDefaultClasses() {
+  for (let className = 1; className <= 12; className += 1) {
+    await pool.query(
+      `insert into classes (class_name, section)
+       values ($1, 'A')
+       on conflict (class_name, section) do nothing`,
+      [className],
+    );
+  }
+}
+
 export async function ensureSchema() {
   if (schemaInitialized) return;
 
@@ -43,6 +54,7 @@ export async function ensureSchema() {
   const schemaSql = await readFile(schemaPath, "utf8");
 
   await pool.query(schemaSql);
+  await ensureDefaultClasses();
   await ensureDefaultAdmin();
 
   schemaInitialized = true;
