@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { api } from '../services/api.js'
 import { useAuth } from '../auth/useAuth.js'
+import { useClassSelection } from '../class/useClassSelection.js'
 
 function todayISO() {
   const d = new Date()
@@ -12,9 +13,11 @@ function todayISO() {
 
 export function AttendancePage() {
   const { user } = useAuth()
+  const { selectedClassId, selectedClass } = useClassSelection()
   const [error, setError] = useState('')
   const [rows, setRows] = useState([])
   const [myRows, setMyRows] = useState([])
+  const [students, setStudents] = useState([])
   const [date, setDate] = useState(() => todayISO())
   const [mark, setMark] = useState({ student_id: '', status: 'present' })
 
@@ -23,13 +26,26 @@ export function AttendancePage() {
   const loadForDate = useCallback(async () => {
     setError('')
     try {
-      const res = await api.get(`/attendance/${date}`)
+      const res = await api.get(`/attendance`, {
+        params: { date, ...(selectedClassId ? { class_id: selectedClassId } : {}) },
+      })
       setRows(res.data.attendance || [])
     } catch (e) {
       setRows([])
       setError(e?.response?.data?.error || 'Failed to load attendance')
     }
-  }, [date])
+  }, [date, selectedClassId])
+
+  const loadStudents = useCallback(async () => {
+    try {
+      if (!selectedClassId) return setStudents([])
+      const res = await api.get('/students', { params: { class_id: selectedClassId } })
+      setStudents(res.data.students || [])
+    } catch (e) {
+      void e
+      setStudents([])
+    }
+  }, [selectedClassId])
 
   const loadMyAttendance = useCallback(async () => {
     setError('')
@@ -45,9 +61,12 @@ export function AttendancePage() {
   }, [])
 
   useEffect(() => {
-    if (isStaff) loadForDate()
+    if (isStaff) {
+      loadStudents()
+      loadForDate()
+    }
     else loadMyAttendance()
-  }, [isStaff, loadForDate, loadMyAttendance])
+  }, [isStaff, loadForDate, loadMyAttendance, loadStudents])
 
   async function markAttendance(e) {
     e.preventDefault()
@@ -55,6 +74,7 @@ export function AttendancePage() {
     try {
       await api.post('/attendance/mark', {
         student_id: Number(mark.student_id),
+        class_id: Number(selectedClassId),
         date,
         status: mark.status,
       })
@@ -91,12 +111,19 @@ export function AttendancePage() {
 
             <form onSubmit={markAttendance} className="flex flex-1 flex-col gap-3 md:flex-row md:items-end">
               <label className="block flex-1">
-                <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-600">Student ID</div>
-                <input
+                <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-600">Student</div>
+                <select
                   value={mark.student_id}
                   onChange={(e) => setMark((s) => ({ ...s, student_id: e.target.value }))}
                   className="w-full rounded-md border bg-white px-3 py-2 text-sm outline-none focus:border-slate-400"
-                />
+                >
+                  <option value="">Select student…</option>
+                  {students.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name} (ID: {s.id})
+                    </option>
+                  ))}
+                </select>
               </label>
               <label className="block">
                 <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-600">Status</div>
@@ -116,9 +143,14 @@ export function AttendancePage() {
           </div>
 
           <Table
-            columns={['Student', 'Class', 'Section', 'Status']}
-            rows={rows.map((r) => [r.student_name, r.class, r.section, r.status])}
-            empty="No attendance marked for this date"
+            columns={[
+              'Student',
+              selectedClass ? `Class ${selectedClass.class_name}` : 'Class',
+              selectedClass ? `Section ${selectedClass.section}` : 'Section',
+              'Status',
+            ]}
+            rows={rows.map((r) => [r.student_name, r.class_name ?? r.class, r.section, r.status])}
+            empty="No attendance marked for this class/date"
           />
         </>
       ) : (

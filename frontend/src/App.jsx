@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './auth/AuthProvider.jsx'
 import { useAuth } from './auth/useAuth.js'
+import { ClassProvider } from './class/ClassProvider.jsx'
 import { Layout } from './components/Layout.jsx'
 import { LoginPage } from './pages/LoginPage.jsx'
 import { DashboardPage } from './pages/DashboardPage.jsx'
@@ -19,25 +20,27 @@ function Protected({ children }) {
 export default function App() {
   return (
     <AuthProvider>
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route
-          path="/"
-          element={
-            <Protected>
-              <Layout />
-            </Protected>
-          }
-        >
-          <Route index element={<DashboardPage />} />
-          <Route path="students" element={<StudentsPage />} />
-          <Route path="attendance" element={<AttendancePage />} />
-          <Route path="fees" element={<FeesPage />} />
-          <Route path="exams" element={<ExamsPage />} />
-          <Route path="results" element={<ResultsPage />} />
-        </Route>
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <ClassProvider>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/"
+            element={
+              <Protected>
+                <Layout />
+              </Protected>
+            }
+          >
+            <Route index element={<DashboardPage />} />
+            <Route path="students" element={<StudentsPage />} />
+            <Route path="attendance" element={<AttendancePage />} />
+            <Route path="fees" element={<FeesPage />} />
+            <Route path="exams" element={<ExamsPage />} />
+            <Route path="results" element={<ResultsPage />} />
+          </Route>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </ClassProvider>
     </AuthProvider>
   )
 }

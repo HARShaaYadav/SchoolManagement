@@ -1,28 +1,30 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { api } from '../services/api.js'
 import { useAuth } from '../auth/useAuth.js'
+import { useClassSelection } from '../class/useClassSelection.js'
 
 export function FeesPage() {
   const { user } = useAuth()
+  const { selectedClassId } = useClassSelection()
   const isAdmin = useMemo(() => user?.role === 'admin', [user?.role])
   const [fees, setFees] = useState([])
   const [error, setError] = useState('')
   const [form, setForm] = useState({ student_id: '', amount: '', due_date: '' })
 
-  async function load() {
+  const load = useCallback(async () => {
     setError('')
     try {
-      const res = await api.get('/fees')
+      const res = await api.get('/fees', { params: selectedClassId ? { class_id: selectedClassId } : {} })
       setFees(res.data.fees || [])
     } catch (e) {
       setFees([])
       setError(e?.response?.data?.error || 'Failed to load fees')
     }
-  }
+  }, [selectedClassId])
 
   useEffect(() => {
     load()
-  }, [])
+  }, [load])
 
   async function addFee(e) {
     e.preventDefault()
@@ -30,6 +32,7 @@ export function FeesPage() {
     try {
       await api.post('/fees', {
         student_id: Number(form.student_id),
+        class_id: Number(selectedClassId),
         amount: Number(form.amount),
         due_date: form.due_date,
       })

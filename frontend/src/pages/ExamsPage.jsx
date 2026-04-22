@@ -1,35 +1,37 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { api } from '../services/api.js'
 import { useAuth } from '../auth/useAuth.js'
+import { useClassSelection } from '../class/useClassSelection.js'
 
 export function ExamsPage() {
   const { user } = useAuth()
+  const { selectedClassId, selectedClass } = useClassSelection()
   const isAdmin = useMemo(() => user?.role === 'admin', [user?.role])
   const [exams, setExams] = useState([])
   const [error, setError] = useState('')
-  const [form, setForm] = useState({ name: '', class: '', date: '' })
+  const [form, setForm] = useState({ name: '', date: '' })
 
-  async function load() {
+  const load = useCallback(async () => {
     setError('')
     try {
-      const res = await api.get('/exams')
+      const res = await api.get('/exams', { params: selectedClassId ? { class_id: selectedClassId } : {} })
       setExams(res.data.exams || [])
     } catch (e) {
       setExams([])
       setError(e?.response?.data?.error || 'Failed to load exams')
     }
-  }
+  }, [selectedClassId])
 
   useEffect(() => {
     load()
-  }, [])
+  }, [load])
 
   async function createExam(e) {
     e.preventDefault()
     setError('')
     try {
-      await api.post('/exams', form)
-      setForm({ name: '', class: '', date: '' })
+      await api.post('/exams', { ...form, class_id: Number(selectedClassId) })
+      setForm({ name: '', date: '' })
       await load()
     } catch (e) {
       setError(e?.response?.data?.error || 'Failed to create exam')
@@ -50,7 +52,10 @@ export function ExamsPage() {
           <div className="mb-3 text-sm font-semibold text-slate-900">Create exam</div>
           <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
             <Input label="Exam name" value={form.name} onChange={(v) => setForm((s) => ({ ...s, name: v }))} />
-            <Input label="Class" value={form.class} onChange={(v) => setForm((s) => ({ ...s, class: v }))} />
+            <ReadOnly
+              label="Class & Section (selected)"
+              value={selectedClass ? `Class ${selectedClass.class_name} - ${selectedClass.section}` : '—'}
+            />
             <label className="block">
               <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-600">Date</div>
               <input
@@ -89,7 +94,7 @@ export function ExamsPage() {
               exams.map((e) => (
                 <tr key={e.id} className="hover:bg-slate-50">
                   <td className="px-3 py-2 font-medium text-slate-900">{e.name}</td>
-                  <td className="px-3 py-2">{e.class}</td>
+                  <td className="px-3 py-2">{e.class_name ?? e.class}</td>
                   <td className="px-3 py-2">{String(e.date).slice(0, 10)}</td>
                 </tr>
               ))
@@ -110,6 +115,15 @@ function Input({ label, value, onChange }) {
         onChange={(e) => onChange(e.target.value)}
         className="w-full rounded-md border bg-white px-3 py-2 text-sm outline-none focus:border-slate-400"
       />
+    </label>
+  )
+}
+
+function ReadOnly({ label, value }) {
+  return (
+    <label className="block">
+      <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-600">{label}</div>
+      <div className="w-full rounded-md border bg-white px-3 py-2 text-sm text-slate-700">{value}</div>
     </label>
   )
 }

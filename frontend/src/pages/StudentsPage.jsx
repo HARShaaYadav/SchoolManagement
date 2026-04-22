@@ -1,37 +1,37 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { api } from '../services/api.js'
 import { useAuth } from '../auth/useAuth.js'
+import { useClassSelection } from '../class/useClassSelection.js'
 
 export function StudentsPage() {
   const { user } = useAuth()
+  const { selectedClassId, selectedClass } = useClassSelection()
   const [students, setStudents] = useState([])
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
   const [form, setForm] = useState({
     user_id: '',
-    class: '',
-    section: '',
     parent_name: '',
     parent_contact: '',
     address: '',
   })
 
-  async function load() {
+  const load = useCallback(async () => {
     setLoading(true)
     setError('')
     try {
-      const res = await api.get('/students')
+      const res = await api.get('/students', { params: selectedClassId ? { class_id: selectedClassId } : {} })
       setStudents(res.data.students || [])
     } catch (e) {
       setError(e?.response?.data?.error || 'Failed to load students')
     } finally {
       setLoading(false)
     }
-  }
+  }, [selectedClassId])
 
   useEffect(() => {
     load()
-  }, [])
+  }, [load])
 
   async function addStudent(e) {
     e.preventDefault()
@@ -40,8 +40,9 @@ export function StudentsPage() {
       await api.post('/students', {
         ...form,
         user_id: Number(form.user_id),
+        class_id: Number(selectedClassId),
       })
-      setForm({ user_id: '', class: '', section: '', parent_name: '', parent_contact: '', address: '' })
+      setForm({ user_id: '', parent_name: '', parent_contact: '', address: '' })
       await load()
     } catch (e) {
       setError(e?.response?.data?.error || 'Failed to add student')
@@ -62,8 +63,7 @@ export function StudentsPage() {
           <div className="mb-3 text-sm font-semibold text-slate-900">Add student</div>
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             <Input label="Student User ID (from register)" value={form.user_id} onChange={(v) => setForm((s) => ({ ...s, user_id: v }))} />
-            <Input label="Class" value={form.class} onChange={(v) => setForm((s) => ({ ...s, class: v }))} />
-            <Input label="Section" value={form.section} onChange={(v) => setForm((s) => ({ ...s, section: v }))} />
+            <ReadOnly label="Selected Class" value={selectedClass ? `Class ${selectedClass.class_name} - ${selectedClass.section}` : '—'} />
             <Input label="Parent Name" value={form.parent_name} onChange={(v) => setForm((s) => ({ ...s, parent_name: v }))} />
             <Input label="Parent Contact" value={form.parent_contact} onChange={(v) => setForm((s) => ({ ...s, parent_contact: v }))} />
             <Input label="Address" value={form.address} onChange={(v) => setForm((s) => ({ ...s, address: v }))} />
@@ -108,7 +108,7 @@ export function StudentsPage() {
                   <tr key={s.id} className="hover:bg-slate-50">
                     <td className="px-3 py-2 font-medium text-slate-900">{s.name}</td>
                     <td className="px-3 py-2 text-slate-700">{s.email}</td>
-                    <td className="px-3 py-2">{s.class}</td>
+                    <td className="px-3 py-2">{s.class_name ?? s.class}</td>
                     <td className="px-3 py-2">{s.section}</td>
                     <td className="px-3 py-2">{s.parent_name}</td>
                     <td className="px-3 py-2">{s.parent_contact}</td>
@@ -132,6 +132,15 @@ function Input({ label, value, onChange }) {
         onChange={(e) => onChange(e.target.value)}
         className="w-full rounded-md border bg-white px-3 py-2 text-sm outline-none focus:border-slate-400"
       />
+    </label>
+  )
+}
+
+function ReadOnly({ label, value }) {
+  return (
+    <label className="block">
+      <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-600">{label}</div>
+      <div className="w-full rounded-md border bg-white px-3 py-2 text-sm text-slate-700">{value}</div>
     </label>
   )
 }

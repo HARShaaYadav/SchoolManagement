@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { api } from '../services/api.js'
 import { useAuth } from '../auth/useAuth.js'
+import { useClassSelection } from '../class/useClassSelection.js'
 
 function todayISO() {
   const d = new Date()
@@ -12,6 +13,7 @@ function todayISO() {
 
 export function DashboardPage() {
   const { user } = useAuth()
+  const { selectedClassId } = useClassSelection()
   const [metrics, setMetrics] = useState({ totalStudents: null, presentToday: null, absentToday: null, feesPending: null })
 
   const date = useMemo(() => todayISO(), [])
@@ -24,14 +26,14 @@ export function DashboardPage() {
 
       if (user?.role === 'admin' || user?.role === 'teacher') {
         try {
-          const students = await api.get('/students')
+          const students = await api.get('/students', { params: selectedClassId ? { class_id: selectedClassId } : {} })
           next.totalStudents = students.data.students.length
         } catch (e) {
           void e
         }
 
         try {
-          const attendance = await api.get(`/attendance/${date}`)
+          const attendance = await api.get(`/attendance`, { params: { date, ...(selectedClassId ? { class_id: selectedClassId } : {}) } })
           const rows = attendance.data.attendance || []
           next.presentToday = rows.filter((r) => r.status === 'present').length
           next.absentToday = rows.filter((r) => r.status === 'absent').length
@@ -40,7 +42,7 @@ export function DashboardPage() {
         }
 
         try {
-          const fees = await api.get('/fees')
+          const fees = await api.get('/fees', { params: selectedClassId ? { class_id: selectedClassId } : {} })
           const rows = fees.data.fees || []
           next.feesPending = rows.filter((f) => f.status === 'pending').length
         } catch (e) {
@@ -63,7 +65,7 @@ export function DashboardPage() {
     return () => {
       cancelled = true
     }
-  }, [date, user?.role])
+  }, [date, selectedClassId, user?.role])
 
   return (
     <div>
