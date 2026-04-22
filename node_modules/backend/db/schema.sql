@@ -6,8 +6,16 @@ create table if not exists users (
   email text not null unique,
   password_hash text not null,
   role text not null check (role in ('admin', 'teacher', 'student')),
+  admission_id text unique,
+  must_change_password boolean not null default false,
   created_at timestamptz not null default now()
 );
+
+alter table users add column if not exists admission_id text;
+alter table users add column if not exists must_change_password boolean not null default false;
+create unique index if not exists idx_users_admission_id_unique
+  on users(admission_id)
+  where admission_id is not null;
 
 create table if not exists classes (
   id bigserial primary key,
@@ -23,10 +31,17 @@ create table if not exists students (
   class_id bigint not null references classes(id),
   class text not null,
   section text not null,
+  phone_number text,
+  blood_group text,
+  profile_photo_url text,
   parent_name text not null,
   parent_contact text not null,
   address text not null
 );
+
+alter table students add column if not exists phone_number text;
+alter table students add column if not exists blood_group text;
+alter table students add column if not exists profile_photo_url text;
 
 create table if not exists teachers (
   id bigserial primary key,
@@ -36,9 +51,19 @@ create table if not exists teachers (
   assigned_class_id bigint null references classes(id)
 );
 
-alter table classes
-  add constraint if not exists fk_classes_class_teacher
-  foreign key (class_teacher_id) references teachers(id) on delete set null;
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_constraint
+    where conname = 'fk_classes_class_teacher'
+  ) then
+    alter table classes
+      add constraint fk_classes_class_teacher
+      foreign key (class_teacher_id) references teachers(id) on delete set null;
+  end if;
+end
+$$;
 
 create table if not exists attendance (
   id bigserial primary key,
@@ -89,4 +114,3 @@ create table if not exists results (
 
 create index if not exists idx_results_student_id on results(student_id);
 create index if not exists idx_results_exam_id on results(exam_id);
-

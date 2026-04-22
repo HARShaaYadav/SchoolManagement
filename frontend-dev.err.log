@@ -1,0 +1,32 @@
+[2m5:03:35 pm[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [31m[Unhandled rejection] [1mAxiosError[22m: Request failed with status code 401
+[39m > settle node_modules/axios/lib/core/settle.js:20:6
+ > XMLHttpRequest.onloadend node_modules/axios/lib/adapters/xhr.js:62:8
+
+[2m5:03:35 pm[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [31m[Unhandled rejection] [1mAxiosError[22m: Request failed with status code 401
+[39m > settle node_modules/axios/lib/core/settle.js:20:6
+ > XMLHttpRequest.onloadend node_modules/axios/lib/adapters/xhr.js:62:8
+
+[2m5:07:25 pm[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [31m[Unhandled rejection] [1mAxiosError[22m: Request failed with status code 401
+[39m > settle node_modules/axios/lib/core/settle.js:20:6
+ > XMLHttpRequest.onloadend node_modules/axios/lib/adapters/xhr.js:62:8
+
+[2m5:07:25 pm[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [31m[Unhandled rejection] [1mAxiosError[22m: Request failed with status code 401
+[39m > settle node_modules/axios/lib/core/settle.js:20:6
+ > XMLHttpRequest.onloadend node_modules/axios/lib/adapters/xhr.js:62:8
+
+[2m5:13:42 pm[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [31m[Unhandled rejection] [1mAxiosError[22m: Request failed with status code 401
+[39m > settle node_modules/axios/lib/core/settle.js:20:6
+ > XMLHttpRequest.onloadend node_modules/axios/lib/adapters/xhr.js:62:8
+
+[2m5:13:42 pm[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [31m[Unhandled rejection] [1mAxiosError[22m: Request failed with status code 401
+[39m > settle node_modules/axios/lib/core/settle.js:20:6
+ > XMLHttpRequest.onloadend node_modules/axios/lib/adapters/xhr.js:62:8
+
+[2m5:17:47 pm[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [31m[Unhandled rejection] [1mAxiosError[22m: Request failed with status code 401
+[39m > settle node_modules/axios/lib/core/settle.js:20:6
+ > XMLHttpRequest.onloadend node_modules/axios/lib/adapters/xhr.js:62:8
+
+[2m5:17:47 pm[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [31m[Unhandled rejection] [1mAxiosError[22m: Request failed with status code 401
+[39m > settle node_modules/axios/lib/core/settle.js:20:6
+ > XMLHttpRequest.onloadend node_modules/axios/lib/adapters/xhr.js:62:8
+

@@ -20,12 +20,17 @@ studentsRouter.get("/", requireAuth, requireRole(["admin", "teacher"]), listStud
 studentsRouter.post(
   "/",
   requireAuth,
-  requireRole("admin"),
+  requireRole(["admin", "teacher"]),
   validate(
     z.object({
       body: z.object({
-        user_id: z.number().int().positive(),
+        admission_id: z.string().min(1),
+        full_name: z.string().min(1),
+        password: z.string().min(6),
         class_id: z.number().int().positive(),
+        phone_number: z.string().min(1).optional(),
+        blood_group: z.string().min(1).optional(),
+        profile_photo_url: z.string().url().optional().or(z.literal("")),
         parent_name: z.string().min(1),
         parent_contact: z.string().min(1),
         address: z.string().min(1),
@@ -38,13 +43,19 @@ studentsRouter.post(
 studentsRouter.put(
   "/:id",
   requireAuth,
-  requireRole("admin"),
+  requireRole(["admin", "teacher"]),
   validate(
     z.object({
       params: z.object({ id: z.coerce.number().int().positive() }),
       body: z
         .object({
+          admission_id: z.string().min(1).optional(),
+          full_name: z.string().min(1).optional(),
+          password: z.string().min(6).optional(),
           class_id: z.number().int().positive().optional(),
+          phone_number: z.string().min(1).optional(),
+          blood_group: z.string().min(1).optional(),
+          profile_photo_url: z.string().url().optional().or(z.literal("")),
           parent_name: z.string().min(1).optional(),
           parent_contact: z.string().min(1).optional(),
           address: z.string().min(1).optional(),
@@ -62,4 +73,3 @@ studentsRouter.delete(
   validate(z.object({ params: z.object({ id: z.coerce.number().int().positive() }) })),
   deleteStudent,
 );
-
